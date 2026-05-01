@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X, TrendingUp, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
-import { useDebounce } from "@/lib/hooks";
+import { useDebounce } from "../../lib/hooks";
 
 interface SearchResult {
   symbol: string;
