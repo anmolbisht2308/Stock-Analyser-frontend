@@ -2,26 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0A0E1A; /* terminal DEFAULT */
+    --foreground: #F1F5F9; /* slate-100 */
+    --card: #111827; /* terminal-100 */
+    --card-foreground: #F1F5F9;
+    --popover: #111827;
+    --popover-foreground: #F1F5F9;
+    --primary: #F59E0B; /* gold DEFAULT */
+    --primary-foreground: #0A0E1A;
+    --secondary: #0D1220; /* terminal-50 */
+    --secondary-foreground: #F1F5F9;
+    --muted: #0D1220;
+    --muted-foreground: #94A3B8; /* slate-400 */
+    --accent: #0D1220;
+    --accent-foreground: #F1F5F9;
+    --destructive: #FF4757; /* bear DEFAULT */
+    --destructive-foreground: #F1F5F9;
+    --border: #0D1220; /* terminal-50 */
+    --input: #0D1220;
+    --ring: #F59E0B; /* gold DEFAULT */
+    --radius: 0.75rem;
+
+    --chart-1: #3B82F6; /* chart.blue */
+    --chart-2: #8B5CF6; /* chart.purple */
+    --chart-3: #00D4AA; /* bull DEFAULT */
+    --chart-4: #F59E0B; /* gold DEFAULT */
+    --chart-5: #FF4757; /* bear DEFAULT */
+  }
+
+  .dark {
+    --background: #0A0E1A;
+    --foreground: #F1F5F9;
+    --card: #111827;
+    --card-foreground: #F1F5F9;
+    --popover: #111827;
+    --popover-foreground: #F1F5F9;
+    --primary: #F59E0B;
+    --primary-foreground: #0A0E1A;
+    --secondary: #0D1220;
+    --secondary-foreground: #F1F5F9;
+    --muted: #0D1220;
+    --muted-foreground: #94A3B8;
+    --accent: #0D1220;
+    --accent-foreground: #F1F5F9;
+    --destructive: #FF4757;
+    --destructive-foreground: #F1F5F9;
+    --border: #0D1220;
+    --input: #0D1220;
+    --ring: #F59E0B;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-terminal text-slate-100 font-sans antialiased;
+  }
+  
+  /* All prices/numbers should use mono font */
+  .font-mono-numbers {
+    @apply font-mono;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* Custom Animations */
+@keyframes priceFlashGreen {
+  0%, 100% { background: transparent; }
+  50% { background: #00D4AA22; }
+}
+
+@keyframes priceFlashRed {
+  0%, 100% { background: transparent; }
+  50% { background: #FF475722; }
+}
+
+.flash-green {
+  animation: priceFlashGreen 0.4s ease;
+}
+
+.flash-red {
+  animation: priceFlashRed 0.4s ease;
 }
