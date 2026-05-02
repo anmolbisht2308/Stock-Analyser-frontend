@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { PriceFlash } from "@/components/shared/PriceFlash";
 import { ScoreGauge } from "@/components/shared/ScoreGauge";
@@ -12,15 +12,33 @@ import { FundamentalTable } from "@/components/analysis/FundamentalTable";
 import { InvestmentThesis } from "@/components/analysis/InvestmentThesis";
 import { NewsSentiment } from "@/components/analysis/NewsSentiment";
 import { CandlestickChart } from "@/components/charts/CandlestickChart";
-import { Loader2 } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
+import { useWatchlistStore } from "@/lib/store/useWatchlistStore";
+import { useAuthStore } from "@/lib/store/useAuthStore";
 
 export default function StockPage() {
   const params = useParams();
   const ticker = params.ticker as string;
-  
+  const router = useRouter();
+  const { isWatched, addTicker, removeTicker } = useWatchlistStore();
+  const { isAuthenticated } = useAuthStore();
+  const watched = isWatched(ticker);
+
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const handleWatchlistToggle = () => {
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    if (watched) {
+      removeTicker(ticker);
+    } else {
+      addTicker(ticker);
+    }
+  };
 
   useEffect(() => {
     if (!ticker) return;
@@ -84,6 +102,18 @@ export default function StockPage() {
             <span className="bg-gold/10 text-gold border border-gold/30 px-2 py-0.5 rounded text-sm font-mono font-bold tracking-wider">
               {ticker}
             </span>
+            {/* Watchlist Star Button */}
+            <button
+              onClick={handleWatchlistToggle}
+              title={watched ? "Remove from Watchlist" : "Add to Watchlist"}
+              className={`p-1.5 rounded-lg transition-all ${
+                watched
+                  ? "text-gold bg-gold/10 hover:bg-gold/20"
+                  : "text-slate-500 hover:text-gold hover:bg-gold/10"
+              }`}
+            >
+              <Star className={`w-5 h-5 ${watched ? "fill-gold" : ""}`} />
+            </button>
           </div>
           <div className="flex items-center gap-2 text-sm text-slate-400 font-mono mb-4">
             <span>{exchange}</span>

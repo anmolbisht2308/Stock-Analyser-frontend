@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutGrid, Star, BarChart2 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutGrid, Star, BarChart2, LogIn, LogOut, User } from "lucide-react";
 import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/lib/store/useAuthStore";
+import { api } from "@/lib/api";
 
 const navLinks = [
   { href: "/screener", label: "Screener", icon: LayoutGrid },
@@ -13,6 +15,17 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { isAuthenticated, user, logout, refreshToken } = useAuthStore();
+
+  const handleLogout = async () => {
+    try {
+      if (refreshToken) await api.post("/auth/logout", { refreshToken });
+    } catch { /* silent */ } finally {
+      logout();
+      router.push("/");
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-terminal/80 backdrop-blur-md">
@@ -50,6 +63,34 @@ export function Navbar() {
             </Link>
           ))}
         </nav>
+
+        {/* Auth section */}
+        <div className="shrink-0 flex items-center gap-2">
+          {isAuthenticated ? (
+            <>
+              <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10">
+                <User className="w-3.5 h-3.5" />
+                <span className="max-w-[120px] truncate">{user?.email}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                title="Logout"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:block">Logout</span>
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-gold/10 text-gold border border-gold/20 hover:bg-gold/20 transition-colors"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Login</span>
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );
