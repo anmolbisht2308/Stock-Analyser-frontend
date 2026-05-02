@@ -2,21 +2,35 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, Star, BarChart2, LogIn, LogOut, User } from "lucide-react";
+import { LayoutGrid, Star, BarChart2, LogIn, LogOut, User, Zap } from "lucide-react";
 import { SearchBar } from "./SearchBar";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/lib/store/useAuthStore";
 import { api } from "@/lib/api";
+import { PlanBadge } from "@/components/payment/PlanBadge";
+import { useEffect } from "react";
 
 const navLinks = [
   { href: "/screener", label: "Screener", icon: LayoutGrid },
   { href: "/watchlist", label: "Watchlist", icon: Star },
+  { href: "/pricing",  label: "Pricing",  icon: Zap },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, user, logout, refreshToken } = useAuthStore();
+
+  // Refresh plan info on mount when authenticated
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    api.get("/payments/my-plan").then(({ data }) => {
+      // Update user plan in store without full re-login
+      useAuthStore.setState((s) => ({
+        user: s.user ? { ...s.user, plan: data.plan, planExpiresAt: data.planExpiresAt } : s.user,
+      }));
+    }).catch(() => {});
+  }, [isAuthenticated]);
 
   const handleLogout = async () => {
     try {
@@ -68,9 +82,10 @@ export function Navbar() {
         <div className="shrink-0 flex items-center gap-2">
           {isAuthenticated ? (
             <>
-              <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10">
+              <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10">
                 <User className="w-3.5 h-3.5" />
-                <span className="max-w-[120px] truncate">{user?.email}</span>
+                <span className="max-w-[110px] truncate">{user?.email}</span>
+                <PlanBadge plan={user?.plan} />
               </div>
               <button
                 onClick={handleLogout}

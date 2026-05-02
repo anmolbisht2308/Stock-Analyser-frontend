@@ -4,6 +4,9 @@ import { persist, createJSONStorage } from "zustand/middleware";
 interface User {
   id: string;
   email: string;
+  plan?: "free" | "pro" | "institutional";
+  planExpiresAt?: string | null;
+  analysisCountToday?: number;
 }
 
 interface AuthState {

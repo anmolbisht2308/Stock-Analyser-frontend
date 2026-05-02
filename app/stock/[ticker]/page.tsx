@@ -15,40 +15,51 @@ import { CandlestickChart } from "@/components/charts/CandlestickChart";
 import { Loader2, Star } from "lucide-react";
 import { useWatchlistStore } from "@/lib/store/useWatchlistStore";
 import { useAuthStore } from "@/lib/store/useAuthStore";
+import { UpgradeModal } from "@/components/payment/UpgradeModal";
 
 export default function StockPage() {
   const params = useParams();
   const ticker = params.ticker as string;
   const router = useRouter();
   const { isWatched, addTicker, removeTicker } = useWatchlistStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const watched = isWatched(ticker);
 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [upgradeModal, setUpgradeModal] = useState<{ reason: "quota" | "plan"; limit?: number; used?: number } | null>(null);
 
   const handleWatchlistToggle = () => {
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-    if (watched) {
-      removeTicker(ticker);
-    } else {
-      addTicker(ticker);
-    }
+    if (!isAuthenticated) { router.push("/login"); return; }
+    watched ? removeTicker(ticker) : addTicker(ticker);
   };
 
   useEffect(() => {
     if (!ticker) return;
     setLoading(true);
-    // Ideally this uses TanStack query, but keeping it simple for the layout first
+    // If not authenticated, redirect to login
+    if (!isAuthenticated) {
+      router.push(`/login`);
+      return;
+    }
     api.get(`/stock/${ticker}/analysis`)
       .then(res => setData(res.data))
-      .catch(err => setError(err.response?.data?.error || "Failed to load stock data."))
+      .catch(err => {
+        const status  = err.response?.status;
+        const details = err.response?.data?.error?.details;
+        if (status === 401) {
+          router.push("/login");
+        } else if (status === 402) {
+          setUpgradeModal({ reason: "quota", limit: details?.limit, used: details?.used });
+        } else if (status === 403) {
+          setUpgradeModal({ reason: "plan" });
+        } else {
+          setError(err.response?.data?.error?.message || "Failed to load stock data.");
+        }
+      })
       .finally(() => setLoading(false));
-  }, [ticker]);
+  }, [ticker, isAuthenticated]);
 
   if (loading) {
     return (
@@ -59,15 +70,33 @@ export default function StockPage() {
     );
   }
 
+  if (upgradeModal) {
+    return (
+      <>
+        <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
+          <p className="text-slate-400 font-mono text-sm">Analysis not available.</p>
+        </div>
+        <UpgradeModal
+          reason={upgradeModal.reason}
+          currentPlan={user?.plan ?? "free"}
+          limit={upgradeModal.limit}
+          used={upgradeModal.used}
+          onClose={() => setUpgradeModal(null)}
+        />
+      </>
+    );
+  }
+
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh]">
+      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-2">
         <p className="text-bear font-mono text-lg">{error}</p>
       </div>
     );
   }
 
   if (!data || !data.analysis) return null;
+
 
   const { analysis, raw } = data;
   const currentPrice = raw.quote.currentPrice;

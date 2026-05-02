@@ -4,6 +4,7 @@ import "./globals.css";
 import { QueryProvider } from "@/components/shared/QueryProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { TickerTape } from "@/components/layout/TickerTape";
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -37,7 +38,10 @@ export default function RootLayout({
             StockAI — AI analysis is not financial advice. Data via Yahoo Finance.
           </footer>
         </QueryProvider>
+        {/* Razorpay SDK — loaded globally so it's ready on any page */}
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       </body>
+
     </html>
   );
 }
