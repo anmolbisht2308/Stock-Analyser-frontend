@@ -82,11 +82,14 @@ export function Navbar() {
         <div className="shrink-0 flex items-center gap-2">
           {isAuthenticated ? (
             <>
-              <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10">
+              <Link
+                href="/profile"
+                className="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400 bg-white/5 px-2.5 py-1.5 rounded-lg border border-white/10 hover:border-gold/30 hover:text-slate-200 transition-colors"
+              >
                 <User className="w-3.5 h-3.5" />
                 <span className="max-w-[110px] truncate">{user?.email}</span>
                 <PlanBadge plan={user?.plan} />
-              </div>
+              </Link>
               <button
                 onClick={handleLogout}
                 title="Logout"
