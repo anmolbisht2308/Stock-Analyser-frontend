@@ -10,7 +10,6 @@ import { MultibaggerCard } from "@/components/analysis/MultibaggerCard";
 import { TechnicalSignals } from "@/components/analysis/TechnicalSignals";
 import { FundamentalTable } from "@/components/analysis/FundamentalTable";
 import { InvestmentThesis } from "@/components/analysis/InvestmentThesis";
-import { NewsSentiment } from "@/components/analysis/NewsSentiment";
 import { CandlestickChart } from "@/components/charts/CandlestickChart";
 import { Loader2, Star } from "lucide-react";
 import { useWatchlistStore } from "@/lib/store/useWatchlistStore";
@@ -212,8 +211,8 @@ export default function StockPage() {
         />
       </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-12">
+      <div className="grid grid-cols-1 gap-8">
+        <div className="space-y-12">
           {/* SECTION 5: FUNDAMENTALS */}
           <section>
              <h2 className="text-lg font-semibold text-slate-200 mb-4">Fundamental Analysis</h2>
@@ -225,13 +224,6 @@ export default function StockPage() {
             <h2 className="text-lg font-semibold text-slate-200 mb-4">Technical Indicators (Groq Derived)</h2>
             <TechnicalSignals signals={analysis.technicalSummary.signals} />
           </section>
-        </div>
-
-        <div className="space-y-12">
-           {/* SECTION 7: NEWS SENTIMENT */}
-           <section>
-             <NewsSentiment news={raw.news} sentiment={analysis.newsSentiment} />
-           </section>
         </div>
       </div>
     </div>

@@ -3,7 +3,6 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/shared/QueryProvider";
 import { Navbar } from "@/components/layout/Navbar";
-import { TickerTape } from "@/components/layout/TickerTape";
 import Script from "next/script";
 
 const inter = Inter({
@@ -32,7 +31,6 @@ export default function RootLayout({
       >
         <QueryProvider>
           <Navbar />
-          <TickerTape />
           <main className="flex-1">{children}</main>
           <footer className="border-t border-white/5 py-6 text-center text-slate-500 text-xs font-mono">
             StockAI — AI analysis is not financial advice. Data via Yahoo Finance.
